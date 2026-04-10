@@ -74,6 +74,7 @@ export default function InputToolbar({ onSubmit, disabled }) {
   const [vidCfg,     setVidCfg]     = useState(DEF_VID_CFG)
   const [media,      setMedia]      = useState([])
   const [text,       setText]       = useState('')
+  const [enhance,    setEnhance]    = useState(false)
 
   // One active dropdown at a time
   const [openDD, setOpenDD] = useState(null)
@@ -96,7 +97,7 @@ export default function InputToolbar({ onSubmit, disabled }) {
 
   const handleSubmit = () => {
     if (!canSubmit) return
-    onSubmit({ text, mediaItems: media, genType, model, config })
+    onSubmit({ text, mediaItems: media, genType, model, config, enhancePrompt: enhance })
     setText('')
     setMedia([])
   }
@@ -230,6 +231,33 @@ export default function InputToolbar({ onSubmit, disabled }) {
           </Popover>
 
           <div style={{ flex: 1 }} />
+
+          {/* Prompt enhance toggle */}
+          <button
+            onClick={() => setEnhance(v => !v)}
+            title={enhance ? '已开启 Seed Pro 提示词增强' : '开启后将用 Seed Pro 优化你的描述'}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              padding: '4px 10px',
+              borderRadius: 20,
+              border: `1px solid ${enhance ? 'var(--gold)' : 'var(--border)'}`,
+              background: enhance ? 'var(--gold-dim)' : 'transparent',
+              fontFamily: 'var(--ff-mono)',
+              fontSize: 10,
+              letterSpacing: '0.05em',
+              color: enhance ? 'var(--gold)' : 'var(--text-3)',
+              transition: 'all 0.2s',
+              flexShrink: 0,
+              whiteSpace: 'nowrap',
+            }}
+            onMouseEnter={e => { if (!enhance) { e.currentTarget.style.borderColor = 'var(--border-2)'; e.currentTarget.style.color = 'var(--text-2)' } }}
+            onMouseLeave={e => { if (!enhance) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-3)' } }}
+          >
+            <span style={{ fontSize: 11 }}>✦</span>
+            {enhance ? 'Seed 增强' : '直接生成'}
+          </button>
 
           {/* Submit */}
           <button

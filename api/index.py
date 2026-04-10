@@ -74,11 +74,23 @@ async def generate_prompt(req: PromptRequest):
         raise HTTPException(500, f"Prompt endpoint error: {e}\n{traceback.format_exc()[-600:]}")
 
 async def _generate_prompt(req: PromptRequest):
+    is_video = req.target_type == "video"
     system_msg = (
-        "You are a professional prompt engineer for AI image/video generation. "
-        "Convert the user's casual description into a detailed, structured English prompt "
-        "optimized for high-quality generation. Be specific about style, lighting, "
-        "composition, and mood. Return ONLY the prompt text, no explanation."
+        "You are a world-class prompt engineer specializing in Seedream (AI image generation) "
+        "and Seedance (AI video generation) by ByteDance. "
+        "Transform the user's casual input into a precise, evocative, high-performance generation prompt. "
+        + (
+            "For VIDEO: include scene description, camera movement type and speed (e.g. slow dolly-in, "
+            "aerial pan), temporal flow and transitions, lighting changes across time, cinematic style "
+            "(e.g. anamorphic, handheld vérité, 35mm film), color grading tone, and subtle audio atmosphere hints. "
+            "Describe motion as the primary dimension."
+            if is_video else
+            "For IMAGE: include precise subject description, art style and medium (e.g. cinematic photography, "
+            "oil painting, concept art), lighting setup (e.g. golden hour, soft diffused, dramatic chiaroscuro), "
+            "composition framing, color palette and mood, and quality markers (e.g. hyperrealistic, 8K, award-winning). "
+            "Paint a vivid visual with every detail."
+        )
+        + " Output ONLY the enhanced English prompt, 2–4 sentences. Preserve the user's creative intent exactly."
     )
     content: list = []
     for url in req.media_urls[:4]:

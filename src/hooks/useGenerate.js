@@ -102,8 +102,8 @@ export function useGenerate() {
     })
   }, [])
 
-  const submit = useCallback(async ({ text, mediaItems, genType, model, config }) => {
-    const submitParams = { text, mediaItems, genType, model, config }
+  const submit = useCallback(async ({ text, mediaItems, genType, model, config, enhancePrompt = false }) => {
+    const submitParams = { text, mediaItems, genType, model, config, enhancePrompt }
 
     // 1. User message
     const userMsg = {
@@ -127,7 +127,7 @@ export function useGenerate() {
       role: 'assistant',
       type: genType,
       status: 'loading',
-      loadingText: mediaItems.some(i => !i.url) ? '正在上传素材...' : '正在生成提示词...',
+      loadingText: mediaItems.some(i => !i.url) ? '正在上传素材...' : (enhancePrompt ? '正在增强提示词...' : `正在生成${genType === 'image' ? '图片' : '视频'}...`),
       prompt: null,
       imageUrls: null,
       videoUrl: null,
@@ -143,12 +143,16 @@ export function useGenerate() {
           return { ...item, url }
         })
       )
-      updateMsg(aiId, { loadingText: '正在生成提示词...' })
-
-      // 4. Generate optimized prompt
       const uploadedUrls = uploadedItems.map(i => i.url).filter(Boolean)
-      const prompt = await generatePrompt(text, uploadedUrls, genType)
-      updateMsg(aiId, { prompt, loadingText: `正在生成${genType === 'image' ? '图片' : '视频'}...` })
+
+      // 4. Prompt: enhance with Seed Pro if toggled, otherwise use text directly
+      let prompt = text
+      if (enhancePrompt) {
+        updateMsg(aiId, { loadingText: '✦ Seed Pro 增强提示词中...' })
+        prompt = await generatePrompt(text, uploadedUrls, genType)
+        updateMsg(aiId, { prompt })
+      }
+      updateMsg(aiId, { loadingText: `正在生成${genType === 'image' ? '图片' : '视频'}...` })
 
       if (genType === 'image') {
         // 5a. Image
