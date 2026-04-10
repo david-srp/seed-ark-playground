@@ -36,7 +36,11 @@ async function generateImage(prompt, imageUrls, config) {
       aspect_ratio: config.ratio || '1:1',
     }),
   })
-  if (!res.ok) throw new Error('Image generation failed')
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    console.error('[image] API error:', res.status, body)
+    throw new Error(`Image generation failed (${res.status}): ${body.detail || body.error || ''}`)
+  }
   const data = await res.json()
   return data.urls
 }

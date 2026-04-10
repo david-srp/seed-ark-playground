@@ -125,7 +125,14 @@ class ImageRequest(BaseModel):
 async def generate_image(req: ImageRequest):
     if not ARK_API_KEY:
         raise HTTPException(500, "ARK_API_KEY not set")
+    try:
+        return await _generate_image(req)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, f"Image endpoint error: {e}\n{traceback.format_exc()[-600:]}")
 
+async def _generate_image(req: ImageRequest):
     payload: dict = {
         "model": "seedream-5-0-260128",
         "prompt": req.prompt,
@@ -137,17 +144,18 @@ async def generate_image(req: ImageRequest):
     if req.image_urls:
         payload["image"] = req.image_urls
 
-    async with httpx.AsyncClient(timeout=120) as client:
+    async with httpx.AsyncClient(timeout=55) as client:
         resp = await client.post(
             f"{ARK_BASE_URL}/images/generations",
             headers={"Authorization": f"Bearer {ARK_API_KEY}"},
             json=payload,
         )
     if resp.status_code != 200:
-        raise HTTPException(502, f"Seedream error: {resp.text}")
+        raise HTTPException(502, f"Seedream error {resp.status_code}: {resp.text[:600]}")
     data = resp.json()
     urls = [item["url"] for item in data.get("data", [])]
     return {"urls": urls}
+
 
 
 # ── Video generation (Seedance) ─────────────────────────────────────────
