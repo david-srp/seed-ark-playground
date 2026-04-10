@@ -1,35 +1,38 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useRef, useEffect } from 'react'
+import ChatHistory from './components/ChatHistory'
+import InputToolbar from './components/InputToolbar'
+import { useGenerate } from './hooks/useGenerate'
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const { messages, submit, clearHistory, fillFromMessage } = useGenerate()
+  const bottomRef = useRef(null)
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  const isLoading = messages.some(m => m.role === 'assistant' && m.status === 'loading')
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <div className="flex flex-col h-screen max-w-3xl mx-auto bg-white shadow-sm">
+      <header className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <h1 className="text-base font-semibold text-gray-800">Seed 创作工具</h1>
+        <button
+          onClick={clearHistory}
+          className="text-xs text-gray-400 hover:text-gray-600 transition"
+        >
+          清空记录
         </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+      </header>
+
+      <ChatHistory
+        messages={messages}
+        onRegenerate={(msg) => submit(msg._submitParams)}
+        onEdit={(msg) => fillFromMessage && fillFromMessage(msg)}
+      />
+      <div ref={bottomRef} />
+
+      <InputToolbar onSubmit={submit} disabled={isLoading} />
+    </div>
   )
 }
-
-export default App
