@@ -1,11 +1,19 @@
 import os
+import traceback
 import httpx
 from typing import List, Optional
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 app = FastAPI()
+
+# Return actual error detail instead of opaque 500
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    tb = traceback.format_exc()
+    return JSONResponse(status_code=500, content={"error": str(exc), "trace": tb[-800:]})
 
 app.add_middleware(
     CORSMiddleware,
@@ -58,7 +66,14 @@ class PromptRequest(BaseModel):
 async def generate_prompt(req: PromptRequest):
     if not ARK_API_KEY:
         raise HTTPException(500, "ARK_API_KEY not set")
+    try:
+        return await _generate_prompt(req)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, f"Prompt endpoint error: {e}\n{traceback.format_exc()[-600:]}")
 
+async def _generate_prompt(req: PromptRequest):
     system_msg = (
         "You are a professional prompt engineer for AI image/video generation. "
         "Convert the user's casual description into a detailed, structured English prompt "
@@ -91,10 +106,11 @@ async def generate_prompt(req: PromptRequest):
             },
         )
     if resp.status_code != 200:
-        raise HTTPException(502, f"Seed 2.0 Pro error: {resp.text}")
+        raise HTTPException(502, f"Seed 2.0 Pro error {resp.status_code}: {resp.text[:400]}")
     data = resp.json()
     prompt = data["choices"][0]["message"]["content"].strip()
     return {"prompt": prompt}
+
 
 
 # ── Image generation (Seedream 5.0) ────────────────────────────────────

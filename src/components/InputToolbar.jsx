@@ -153,13 +153,13 @@ export default function InputToolbar({ onSubmit, disabled }) {
         {/* Divider */}
         <div style={{ height: 1, background: 'var(--border)', margin: '12px 0 0' }} />
 
-        {/* Control bar */}
+        {/* Control bar — no overflow:auto here, it clips the popups */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
           padding: '8px 12px 10px',
           gap: 4,
-          overflowX: 'auto',
+          flexWrap: 'wrap',
         }}>
           {/* Gen type */}
           <DropMenu
