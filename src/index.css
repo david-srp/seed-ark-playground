@@ -3,26 +3,26 @@
 @tailwind utilities;
 
 :root {
-  --bg:          #1a1a18;
-  --bg-1:        #1f1f1d;
-  --bg-2:        #222220;
-  --bg-3:        #2a2a28;
-  --bg-4:        #3a3a38;
-  --border:      rgba(255,255,255,0.06);
-  --border-2:    rgba(255,255,255,0.11);
-  --accent:      #0d9488;
-  --accent-dim:  rgba(13,148,136,0.15);
-  --accent-glow: rgba(13,148,136,0.28);
-  /* keep --gold as alias for accent so components still compile during migration */
-  --gold:        #0d9488;
-  --gold-dim:    rgba(13,148,136,0.15);
-  --gold-glow:   rgba(13,148,136,0.28);
-  --text-1:      #e8e8e4;
-  --text-2:      #a0a09a;
-  --text-3:      #6b6b65;
+  --bg:          #080809;
+  --bg-1:        #0d0d0f;
+  --bg-2:        #121214;
+  --bg-3:        #1a1a1e;
+  --bg-4:        #252529;
+  --border:      rgba(255,255,255,0.07);
+  --border-2:    rgba(255,255,255,0.13);
+  --accent:      #E63946;
+  --accent-dim:  rgba(230,57,70,0.14);
+  --accent-glow: rgba(230,57,70,0.32);
+  /* aliases */
+  --gold:        #E63946;
+  --gold-dim:    rgba(230,57,70,0.14);
+  --gold-glow:   rgba(230,57,70,0.32);
+  --text-1:      #f0f0f0;
+  --text-2:      #888893;
+  --text-3:      #4a4a55;
   --radius:      14px;
-  --ff-display: 'DM Sans', system-ui, sans-serif;
-  --ff-body:    'DM Sans', system-ui, sans-serif;
+  --ff-display: 'Clash Display', 'Satoshi', system-ui, sans-serif;
+  --ff-body:    'Satoshi', system-ui, sans-serif;
   --ff-mono:    'JetBrains Mono', 'Courier New', monospace;
 }
 
@@ -42,14 +42,14 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── Grain overlay — below content (z-index 0) ── */
+/* ── Grain overlay — below all content ── */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.18;
+  opacity: 0.14;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
   background-size: 180px 180px;
 }
@@ -78,6 +78,10 @@ body::before {
 @keyframes reveal {
   from { opacity: 0; clip-path: inset(8px 8px 8px 8px round 16px); }
   to   { opacity: 1; clip-path: inset(0px 0px 0px 0px round 16px); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ── Utility classes ────────────────────────────── */

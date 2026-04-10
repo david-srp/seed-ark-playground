@@ -151,10 +151,13 @@ async def generate_image(req: ImageRequest):
         raise HTTPException(500, f"Image endpoint error: {e}\n{traceback.format_exc()[-600:]}")
 
 async def _generate_image(req: ImageRequest):
+    # Map frontend size labels to API-accepted values
+    # Seedream Lite only supports up to 2K; sending "4K" will cause an error
+    size_map = {"2K": "2K", "4K": "2K"}  # cap at 2K for lite model
     payload: dict = {
-        "model": IMAGE_MODEL_MAP.get(req.model, IMAGE_MODEL_MAP["seedream"]),
+        "model": IMAGE_MODEL_MAP.get(req.model, IMAGE_MODEL_MAP["lite"]),
         "prompt": req.prompt,
-        "size": req.size,
+        "size": size_map.get(req.size, "2K"),
         "response_format": "url",
         "watermark": False,
         "sequential_image_generation": "disabled",
@@ -189,6 +192,7 @@ class VideoRequest(BaseModel):
     ratio: str = "16:9"
     duration: int = 5
     generate_audio: bool = True
+    resolution: str = "720p"
 
 
 @app.post("/api/video")
@@ -210,6 +214,7 @@ async def submit_video(req: VideoRequest):
         "content": content,
         "ratio": req.ratio,
         "duration": req.duration,
+        "resolution": req.resolution,
         "generate_audio": req.generate_audio,
         "watermark": False,
     }

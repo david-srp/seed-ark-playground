@@ -1,10 +1,12 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import ChatHistory from './components/ChatHistory'
 import InputToolbar from './components/InputToolbar'
 import { useGenerate } from './hooks/useGenerate'
 
 export default function App() {
   const { messages, submit, clearHistory } = useGenerate()
+  const [genType, setGenType] = useState('image')
+  const [pendingText, setPendingText] = useState('')   // suggestion → toolbar
   const bottomRef = useRef(null)
 
   useEffect(() => {
@@ -14,7 +16,6 @@ export default function App() {
   const isLoading = messages.some(m => m.role === 'assistant' && m.status === 'loading')
 
   const handleRegenerate = (msg) => {
-    // _submitParams may be absent for messages loaded from localStorage
     if (!msg._submitParams) return
     submit(msg._submitParams)
   }
@@ -27,17 +28,17 @@ export default function App() {
       width: '100%',
       background: 'var(--bg)',
       position: 'relative',
-      zIndex: 1,  /* ensures content renders above body::before grain (z-index:0) */
+      zIndex: 1,
     }}>
-      {/* Ambient radial glow */}
+      {/* Ambient red glow */}
       <div style={{
         position: 'fixed',
-        top: '15%',
+        top: '10%',
         left: '50%',
         transform: 'translateX(-50%)',
-        width: 600,
-        height: 300,
-        background: 'radial-gradient(ellipse, rgba(197,164,94,0.045) 0%, transparent 70%)',
+        width: 700,
+        height: 280,
+        background: 'radial-gradient(ellipse, rgba(230,57,70,0.06) 0%, transparent 70%)',
         pointerEvents: 'none',
         zIndex: 0,
       }} />
@@ -47,32 +48,33 @@ export default function App() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '16px 24px',
+        padding: '14px 24px',
         borderBottom: '1px solid var(--border)',
         zIndex: 10,
         position: 'relative',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {/* Logo mark */}
           <div style={{
-            width: 28,
-            height: 28,
-            border: '1px solid var(--gold)',
-            borderRadius: 7,
+            width: 26,
+            height: 26,
+            background: 'var(--accent)',
+            borderRadius: 6,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            opacity: 0.85,
           }}>
-            <div style={{ width: 8, height: 8, background: 'var(--gold)', borderRadius: 2 }} />
+            <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+              <path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/>
+              <circle cx="7" cy="7" r="1.5" fill="white"/>
+            </svg>
           </div>
           <span style={{
             fontFamily: 'var(--ff-display)',
-            fontStyle: 'italic',
-            fontSize: 18,
-            fontWeight: 500,
+            fontSize: 17,
+            fontWeight: 700,
             color: 'var(--text-1)',
-            letterSpacing: '0.03em',
+            letterSpacing: '0.02em',
           }}>Seed Studio</span>
         </div>
 
@@ -82,7 +84,7 @@ export default function App() {
             fontFamily: 'var(--ff-body)',
             fontSize: 11,
             color: 'var(--text-3)',
-            letterSpacing: '0.06em',
+            letterSpacing: '0.04em',
             padding: '5px 10px',
             border: '1px solid transparent',
             borderRadius: 8,
@@ -100,8 +102,10 @@ export default function App() {
         <div style={{ maxWidth: 680, margin: '0 auto' }}>
           <ChatHistory
             messages={messages}
+            genType={genType}
             onRegenerate={handleRegenerate}
-            onEdit={() => {}} // TODO: fill toolbar
+            onEdit={() => {}}
+            onSuggestionSelect={setPendingText}
           />
           <div ref={bottomRef} />
         </div>
@@ -109,17 +113,17 @@ export default function App() {
 
       {/* Floating toolbar */}
       <div style={{ position: 'relative', zIndex: 50 }}>
-        <div style={{ maxWidth: 720, margin: '0 auto' }}>
-          <InputToolbar onSubmit={submit} disabled={isLoading} />
-        </div>
+        <InputToolbar
+          onSubmit={submit}
+          disabled={isLoading}
+          genType={genType}
+          onGenTypeChange={setGenType}
+          pendingText={pendingText}
+          onPendingTextConsumed={() => setPendingText('')}
+        />
       </div>
 
-      {/* Spin animation for video spinner */}
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   )
 }

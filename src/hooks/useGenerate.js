@@ -56,6 +56,7 @@ async function submitVideo(prompt, mediaItems, config, model) {
       model,
       ratio: config.ratio || '16:9',
       duration: config.duration || 5,
+      resolution: config.videoResolution || '720p',
       generate_audio: true,
     }),
   })

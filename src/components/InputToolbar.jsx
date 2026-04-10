@@ -1,12 +1,12 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import RefUploader from './RefUploader'
 import ConfigPopup, { REFERENCE_MODES } from './ConfigPopup'
 import Popover from './Popover'
 import MentionTextarea, { assignDisplayNames } from './MentionTextarea'
 
+/* Only Lite model for image */
 const IMAGE_MODELS = [
   { label: '图片 5.0 Lite', value: 'lite' },
-  { label: '图片 5.0',      value: 'seedream' },
 ]
 const VIDEO_MODELS = [
   { label: 'Seedance 2.0 Fast', value: 'fast' },
@@ -14,7 +14,7 @@ const VIDEO_MODELS = [
 ]
 
 const DEF_IMG_CFG = { ratio: '1:1', resolution: '2K' }
-const DEF_VID_CFG = { ratio: '16:9', duration: 5, refMode: 'all' }
+const DEF_VID_CFG = { ratio: '16:9', duration: 5, refMode: 'all', videoResolution: '720p' }
 
 /* ── Icons ──────────────────────────────────────── */
 function IconImage() {
@@ -26,7 +26,6 @@ function IconImage() {
     </svg>
   )
 }
-
 function IconVideo() {
   return (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -35,7 +34,6 @@ function IconVideo() {
     </svg>
   )
 }
-
 function IconModel() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -43,15 +41,13 @@ function IconModel() {
     </svg>
   )
 }
-
 function IconChevron({ open }) {
   return (
-    <svg width="9" height="5" viewBox="0 0 9 5" fill="none" style={{ transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'none' }}>
+    <svg width="9" height="5" viewBox="0 0 9 5" fill="none" style={{ transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'none', flexShrink: 0 }}>
       <path d="M1 1L4.5 4L8 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   )
 }
-
 function IconAt() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -62,9 +58,9 @@ function IconAt() {
 }
 
 /* ── DropMenu ────────────────────────────────────── */
-function DropMenu({ label, open, onToggle, onClose, items, activeValue, onSelect, align }) {
+function DropMenu({ label, open, onToggle, onClose, items, activeValue, onSelect }) {
   return (
-    <Popover open={open} onClose={onClose} align={align} trigger={
+    <Popover open={open} onClose={onClose} trigger={
       <button onClick={onToggle} style={dropBtnStyle(open)}
         onMouseEnter={e => { if (!open) e.currentTarget.style.color = 'var(--text-1)' }}
         onMouseLeave={e => { if (!open) e.currentTarget.style.color = 'var(--text-2)' }}
@@ -92,7 +88,7 @@ function DropMenu({ label, open, onToggle, onClose, items, activeValue, onSelect
               onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-2)' } }}
             >
               {item.label}
-              {active && <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)', flexShrink: 0 }} />}
+              {active && <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--accent)', flexShrink: 0 }} />}
             </button>
           )
         })}
@@ -101,10 +97,64 @@ function DropMenu({ label, open, onToggle, onClose, items, activeValue, onSelect
   )
 }
 
+/* ── Prompt Enhance Toggle ───────────────────────── */
+function PromptEnhanceToggle({ enabled, onToggle }) {
+  return (
+    <button
+      onClick={onToggle}
+      title={enabled ? 'Seed Pro 将优化你的描述' : '开启后用 Seed Pro 优化描述'}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 6,
+        padding: '4px 10px 4px 8px',
+        borderRadius: 20,
+        border: `1px solid ${enabled ? 'var(--accent)' : 'var(--border)'}`,
+        background: enabled ? 'var(--accent-dim)' : 'transparent',
+        fontFamily: 'var(--ff-mono)',
+        fontSize: 10,
+        letterSpacing: '0.04em',
+        color: enabled ? 'var(--accent)' : 'var(--text-3)',
+        transition: 'all 0.2s',
+        flexShrink: 0,
+        whiteSpace: 'nowrap',
+      }}
+      onMouseEnter={e => { if (!enabled) { e.currentTarget.style.borderColor = 'var(--border-2)'; e.currentTarget.style.color = 'var(--text-2)' } }}
+      onMouseLeave={e => { if (!enabled) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-3)' } }}
+    >
+      {/* Toggle switch */}
+      <div style={{
+        width: 24,
+        height: 13,
+        borderRadius: 7,
+        background: enabled ? 'var(--accent)' : 'var(--bg-4)',
+        position: 'relative',
+        transition: 'background 0.2s',
+        flexShrink: 0,
+      }}>
+        <div style={{
+          position: 'absolute',
+          top: 2,
+          left: enabled ? 13 : 2,
+          width: 9,
+          height: 9,
+          borderRadius: '50%',
+          background: '#fff',
+          transition: 'left 0.2s',
+        }} />
+      </div>
+      Prompt Enhance
+    </button>
+  )
+}
+
 /* ── Main component ──────────────────────────────── */
-export default function InputToolbar({ onSubmit, disabled }) {
-  const [genType,  setGenType]  = useState('image')
-  const [imgModel, setImgModel] = useState('seedream')
+export default function InputToolbar({
+  onSubmit, disabled,
+  genType, onGenTypeChange,
+  pendingText, onPendingTextConsumed,
+}) {
+  const [imgModel, setImgModel] = useState('lite')
   const [vidModel, setVidModel] = useState('fast')
   const [imgCfg,   setImgCfg]   = useState(DEF_IMG_CFG)
   const [vidCfg,   setVidCfg]   = useState(DEF_VID_CFG)
@@ -113,6 +163,14 @@ export default function InputToolbar({ onSubmit, disabled }) {
   const [enhance,  setEnhance]  = useState(false)
   const [openDD,   setOpenDD]   = useState(null)
   const mentionRef = useRef(null)
+
+  // Consume pending text from suggestion clicks
+  useEffect(() => {
+    if (pendingText) {
+      setText(pendingText)
+      onPendingTextConsumed?.()
+    }
+  }, [pendingText, onPendingTextConsumed])
 
   const toggle = (name) => setOpenDD(o => o === name ? null : name)
   const close  = () => setOpenDD(null)
@@ -134,7 +192,7 @@ export default function InputToolbar({ onSubmit, disabled }) {
   const uploaderMode = isFirstLast ? 'first_last' : isAllMode ? 'all' : 'image'
 
   const canSubmit = !disabled && (text.trim().length > 0 || media.length > 0)
-  const canSubmitMention = !disabled && media.length > 0 // mention mode: require at least media
+  const canSend = isAllMode ? !disabled : canSubmit
 
   const handleTextSubmit = () => {
     if (!canSubmit) return
@@ -143,25 +201,20 @@ export default function InputToolbar({ onSubmit, disabled }) {
     setMedia([])
   }
 
-  const handleMentionSubmit = useCallback(() => {
-    const el = mentionRef.current
-    if (!el || disabled) return
-    const { text: mentionText, chipMedia } = el._getContent?.() ?? { text: '', chipMedia: [] }
-    // Merge explicitly uploaded media + any @-mentioned items not already in media
+  const handleMentionSubmit = useCallback(({ text: t, chipMedia }) => {
     const allMedia = [...media]
     for (const chip of chipMedia) {
       if (!allMedia.find(m => m.id === chip.id)) allMedia.push(chip)
     }
-    if (!mentionText.trim() && allMedia.length === 0) return
-    onSubmit({ text: mentionText, mediaItems: allMedia, genType, model, config, enhancePrompt: enhance })
+    onSubmit({ text: t, mediaItems: allMedia, genType, model, config, enhancePrompt: enhance })
     setMedia([])
-    el._clear?.()
-  }, [disabled, media, genType, model, config, enhance, onSubmit])
+  }, [media, genType, model, config, enhance, onSubmit])
+
+  const handleSubmit = isAllMode
+    ? () => { mentionRef.current?._getContent && handleMentionSubmit(mentionRef.current._getContent()); mentionRef.current?._clear?.() }
+    : handleTextSubmit
 
   const namedMedia = isAllMode ? assignDisplayNames(media) : media
-
-  const handleSubmit = isAllMode ? handleMentionSubmit : handleTextSubmit
-  const canSend = isAllMode ? !disabled : canSubmit
 
   return (
     <div style={{
@@ -175,10 +228,10 @@ export default function InputToolbar({ onSubmit, disabled }) {
       <div style={{
         width: '100%',
         maxWidth: 720,
-        background: 'rgba(26,26,24,0.95)',
+        background: 'rgba(8,8,9,0.96)',
         border: '1px solid var(--border-2)',
         borderRadius: 20,
-        boxShadow: '0 8px 48px rgba(0,0,0,0.6)',
+        boxShadow: '0 8px 48px rgba(0,0,0,0.8)',
         overflow: 'visible',
       }}>
         {/* Text + media area */}
@@ -186,20 +239,12 @@ export default function InputToolbar({ onSubmit, disabled }) {
           <RefUploader items={media} onChange={setMedia} mode={uploaderMode} />
 
           {isAllMode ? (
-            /* @ mention textarea for 全能参考 video mode */
             <MentionTextarea
               ref={mentionRef}
               media={namedMedia}
               disabled={disabled}
               placeholder="描述你想要的视频，输入 @ 引用已上传素材…"
-              onSubmit={({ text: t, chipMedia }) => {
-                const allMedia = [...media]
-                for (const chip of chipMedia) {
-                  if (!allMedia.find(m => m.id === chip.id)) allMedia.push(chip)
-                }
-                onSubmit({ text: t, mediaItems: allMedia, genType, model, config, enhancePrompt: enhance })
-                setMedia([])
-              }}
+              onSubmit={handleMentionSubmit}
             />
           ) : (
             <textarea
@@ -249,7 +294,7 @@ export default function InputToolbar({ onSubmit, disabled }) {
         }}>
           {/* Gen type */}
           <DropMenu
-            label={<><span style={{ display: 'flex', marginRight: 5, color: genType === 'image' ? 'var(--accent)' : 'var(--text-2)' }}>{genType === 'image' ? <IconImage /> : <IconVideo />}</span>{genType === 'image' ? '图片生成' : '视频生成'}</>}
+            label={<><span style={{ display: 'flex', marginRight: 5, color: 'var(--accent)' }}>{genType === 'image' ? <IconImage /> : <IconVideo />}</span>{genType === 'image' ? '图片生成' : '视频生成'}</>}
             open={openDD === 'type'}
             onToggle={() => toggle('type')}
             onClose={close}
@@ -258,7 +303,7 @@ export default function InputToolbar({ onSubmit, disabled }) {
               { label: '视频生成', value: 'video' },
             ]}
             activeValue={genType}
-            onSelect={v => { setGenType(v); close() }}
+            onSelect={v => { onGenTypeChange(v); close() }}
           />
 
           <Divider />
@@ -310,20 +355,17 @@ export default function InputToolbar({ onSubmit, disabled }) {
             <ConfigPopup mode={genType} config={config} onChange={setConfig} />
           </Popover>
 
-          {/* @ button (only in 全能参考 video mode) */}
+          {/* @ button (全能参考 only) */}
           {isAllMode && (
             <>
               <Divider />
               <button
-                title="在文本框中输入 @ 来引用已上传素材"
+                title="在文本框中输入 @ 来引用素材"
                 style={{ ...dropBtnStyle(false), color: 'var(--text-3)', padding: '5px 6px' }}
                 onMouseEnter={e => e.currentTarget.style.color = 'var(--accent)'}
                 onMouseLeave={e => e.currentTarget.style.color = 'var(--text-3)'}
                 onClick={() => {
-                  // Focus mention textarea and insert @
-                  const el = mentionRef.current
-                  if (!el) return
-                  el.focus()
+                  mentionRef.current?.focus()
                   document.execCommand('insertText', false, '@')
                 }}
               >
@@ -334,25 +376,8 @@ export default function InputToolbar({ onSubmit, disabled }) {
 
           <div style={{ flex: 1 }} />
 
-          {/* Prompt enhance toggle */}
-          <button
-            onClick={() => setEnhance(v => !v)}
-            title={enhance ? '已开启 Seed Pro 提示词增强' : '开启后将用 Seed Pro 优化你的描述'}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 5,
-              padding: '4px 10px', borderRadius: 20,
-              border: `1px solid ${enhance ? 'var(--accent)' : 'var(--border)'}`,
-              background: enhance ? 'var(--accent-dim)' : 'transparent',
-              fontFamily: 'var(--ff-mono)', fontSize: 10, letterSpacing: '0.05em',
-              color: enhance ? 'var(--accent)' : 'var(--text-3)',
-              transition: 'all 0.2s', flexShrink: 0, whiteSpace: 'nowrap',
-            }}
-            onMouseEnter={e => { if (!enhance) { e.currentTarget.style.borderColor = 'var(--border-2)'; e.currentTarget.style.color = 'var(--text-2)' } }}
-            onMouseLeave={e => { if (!enhance) { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-3)' } }}
-          >
-            <span style={{ fontSize: 11 }}>✦</span>
-            {enhance ? 'Seed 增强' : '直接生成'}
-          </button>
+          {/* Prompt Enhance toggle */}
+          <PromptEnhanceToggle enabled={enhance} onToggle={() => setEnhance(v => !v)} />
 
           {/* Submit */}
           <button
@@ -399,7 +424,7 @@ const menuStyle = {
   borderRadius: 14,
   padding: 6,
   minWidth: 160,
-  boxShadow: '0 16px 48px rgba(0,0,0,0.7)',
+  boxShadow: '0 16px 48px rgba(0,0,0,0.8)',
 }
 
 function Divider() {
