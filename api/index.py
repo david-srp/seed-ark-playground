@@ -110,7 +110,7 @@ async def _generate_prompt(req: PromptRequest):
                 "Content-Type": "application/json",
             },
             json={
-                "model": "seed-2-0-pro-260328",
+                "model": "seed-2-0-lite-260228",
                 "messages": [
                     {"role": "system", "content": system_msg},
                     {"role": "user",   "content": content},
