@@ -168,7 +168,7 @@ function AssistantBubble({ msg, promptOpen, setPromptOpen, onRegenerate, onEdit 
                 textTransform: 'uppercase',
                 transition: 'color 0.2s',
               }}
-              onMouseEnter={e => e.currentTarget.style.color = 'var(--gold)'}
+              onMouseEnter={e => e.currentTarget.style.color = 'var(--accent)'}
               onMouseLeave={e => e.currentTarget.style.color = 'var(--text-3)'}
             >
               <span style={{ transition: 'transform 0.2s', transform: promptOpen ? 'rotate(90deg)' : 'none' }}>▶</span>
@@ -179,7 +179,7 @@ function AssistantBubble({ msg, promptOpen, setPromptOpen, onRegenerate, onEdit 
                 marginTop: 8,
                 background: 'var(--bg-1)',
                 border: '1px solid var(--border)',
-                borderLeft: '2px solid var(--gold)',
+                borderLeft: '2px solid var(--accent)',
                 borderRadius: '0 8px 8px 0',
                 padding: '10px 14px',
               }}>
@@ -307,7 +307,7 @@ function LoadingDots() {
             width: 6,
             height: 6,
             borderRadius: '50%',
-            background: 'var(--gold)',
+            background: 'var(--accent)',
             animationDelay: `${i * 0.2}s`,
           }}
         />
@@ -323,7 +323,7 @@ function VideoSpinner() {
       height: 28,
       borderRadius: '50%',
       border: '2px solid var(--bg-3)',
-      borderTop: '2px solid var(--gold)',
+      borderTop: '2px solid var(--accent)',
       animation: 'spin 1s linear infinite',
     }} />
   )

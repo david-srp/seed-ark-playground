@@ -3,22 +3,26 @@
 @tailwind utilities;
 
 :root {
-  --bg:       #09090B;
-  --bg-1:     #111114;
-  --bg-2:     #18181C;
-  --bg-3:     #222228;
-  --bg-4:     #2C2C34;
-  --border:   rgba(255,255,255,0.06);
-  --border-2: rgba(255,255,255,0.11);
-  --gold:     #C5A45E;
-  --gold-dim: rgba(197,164,94,0.14);
-  --gold-glow:rgba(197,164,94,0.30);
-  --text-1:   #EDE8DE;
-  --text-2:   #857F78;
-  --text-3:   #4A4744;
-  --radius:   14px;
-  --ff-display: 'Cormorant Garamond', Georgia, serif;
-  --ff-body:    'Sora', system-ui, sans-serif;
+  --bg:          #1a1a18;
+  --bg-1:        #1f1f1d;
+  --bg-2:        #222220;
+  --bg-3:        #2a2a28;
+  --bg-4:        #3a3a38;
+  --border:      rgba(255,255,255,0.06);
+  --border-2:    rgba(255,255,255,0.11);
+  --accent:      #0d9488;
+  --accent-dim:  rgba(13,148,136,0.15);
+  --accent-glow: rgba(13,148,136,0.28);
+  /* keep --gold as alias for accent so components still compile during migration */
+  --gold:        #0d9488;
+  --gold-dim:    rgba(13,148,136,0.15);
+  --gold-glow:   rgba(13,148,136,0.28);
+  --text-1:      #e8e8e4;
+  --text-2:      #a0a09a;
+  --text-3:      #6b6b65;
+  --radius:      14px;
+  --ff-display: 'DM Sans', system-ui, sans-serif;
+  --ff-body:    'DM Sans', system-ui, sans-serif;
   --ff-mono:    'JetBrains Mono', 'Courier New', monospace;
 }
 
@@ -38,14 +42,14 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ── Grain overlay ─────────────────────────────── */
+/* ── Grain overlay — below content (z-index 0) ── */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 9000;
-  opacity: 0.28;
+  z-index: 0;
+  opacity: 0.18;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
   background-size: 180px 180px;
 }
@@ -90,7 +94,7 @@ body::before {
 }
 
 .shimmer-text {
-  background: linear-gradient(90deg, var(--text-2) 25%, var(--gold) 50%, var(--text-2) 75%);
+  background: linear-gradient(90deg, var(--text-2) 25%, var(--accent) 50%, var(--text-2) 75%);
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -116,11 +120,11 @@ input, textarea {
   box-sizing: border-box;
 }
 
-/* ── Gold divider ───────────────────────────────── */
+/* ── Accent line ────────────────────────────────── */
 .gold-line {
   display: block;
   width: 24px;
   height: 1px;
-  background: var(--gold);
+  background: var(--accent);
   opacity: 0.6;
 }

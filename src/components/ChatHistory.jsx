@@ -40,9 +40,9 @@ function EmptyState() {
     }}>
       {/* Gold ornament */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 48, height: 1, background: 'linear-gradient(to right, transparent, var(--gold))', opacity: 0.4 }} />
-        <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--gold)', opacity: 0.6 }} />
-        <div style={{ width: 48, height: 1, background: 'linear-gradient(to left, transparent, var(--gold))', opacity: 0.4 }} />
+        <div style={{ width: 48, height: 1, background: 'linear-gradient(to right, transparent, var(--accent))', opacity: 0.4 }} />
+        <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--accent)', opacity: 0.6 }} />
+        <div style={{ width: 48, height: 1, background: 'linear-gradient(to left, transparent, var(--accent))', opacity: 0.4 }} />
       </div>
 
       <h1 style={{

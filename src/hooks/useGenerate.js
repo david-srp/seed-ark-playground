@@ -25,7 +25,7 @@ async function generatePrompt(userText, mediaUrls, targetType) {
   return data.prompt
 }
 
-async function generateImage(prompt, imageUrls, config) {
+async function generateImage(prompt, imageUrls, config, model) {
   const res = await fetch(`${API}/image`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -34,6 +34,7 @@ async function generateImage(prompt, imageUrls, config) {
       image_urls: imageUrls,
       size: config.resolution || '2K',
       aspect_ratio: config.ratio || '1:1',
+      model: model || 'seedream',
     }),
   })
   if (!res.ok) {
@@ -156,7 +157,7 @@ export function useGenerate() {
 
       if (genType === 'image') {
         // 5a. Image
-        const imageUrls = await generateImage(prompt, uploadedUrls, config)
+        const imageUrls = await generateImage(prompt, uploadedUrls, config, model)
         updateMsg(aiId, { status: 'done', imageUrls })
       } else {
         // 5b. Video — submit task then poll

@@ -15,7 +15,6 @@ const VIDEO_RATIOS = ['21:9', '16:9', '4:3', '1:1', '3:4', '9:16']
 export const REFERENCE_MODES = [
   { label: '全能参考', value: 'all',        desc: '综合参考所有素材' },
   { label: '首尾帧',   value: 'first_last', desc: '固定起始与结束帧' },
-  { label: '智能多帧', value: 'multi',      desc: '多帧智能插值' },
 ]
 
 const DURATIONS = Array.from({ length: 12 }, (_, i) => i + 4)
@@ -27,7 +26,6 @@ const panel = {
   padding: '18px 16px',
   width: 300,
   boxShadow: '0 24px 64px rgba(0,0,0,0.7)',
-  backdropFilter: 'blur(16px)',
 }
 
 function Label({ children }) {
@@ -62,18 +60,17 @@ export default function ConfigPopup({ mode, config, onChange }) {
                   gap: 5,
                   padding: '8px 4px',
                   borderRadius: 10,
-                  border: active ? '1px solid var(--gold)' : '1px solid var(--border)',
-                  background: active ? 'var(--gold-dim)' : 'transparent',
+                  border: active ? '1px solid var(--accent)' : '1px solid var(--border)',
+                  background: active ? 'var(--accent-dim)' : 'transparent',
                   transition: 'all 0.15s',
                 }}
                 onMouseEnter={e => { if (!active) { e.currentTarget.style.background = 'var(--bg-3)'; e.currentTarget.style.borderColor = 'var(--border-2)' } }}
                 onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'var(--border)' } }}
               >
-                {/* Aspect ratio visual */}
                 <div style={{
                   width: Math.round(r.w * 0.72),
                   height: Math.round(r.h * 0.72),
-                  border: `1.5px solid ${active ? 'var(--gold)' : 'var(--text-3)'}`,
+                  border: `1.5px solid ${active ? 'var(--accent)' : 'var(--text-3)'}`,
                   borderRadius: 3,
                   transition: 'border-color 0.15s',
                   minWidth: 10,
@@ -82,7 +79,7 @@ export default function ConfigPopup({ mode, config, onChange }) {
                 <span style={{
                   fontFamily: 'var(--ff-mono)',
                   fontSize: 9,
-                  color: active ? 'var(--gold)' : 'var(--text-2)',
+                  color: active ? 'var(--accent)' : 'var(--text-2)',
                   letterSpacing: '0.03em',
                 }}>{r.label}</span>
               </button>
@@ -101,12 +98,12 @@ export default function ConfigPopup({ mode, config, onChange }) {
                 style={{
                   padding: '10px 0',
                   borderRadius: 10,
-                  border: active ? '1px solid var(--gold)' : '1px solid var(--border)',
-                  background: active ? 'var(--gold-dim)' : 'transparent',
+                  border: active ? '1px solid var(--accent)' : '1px solid var(--border)',
+                  background: active ? 'var(--accent-dim)' : 'transparent',
                   fontFamily: 'var(--ff-body)',
                   fontSize: 13,
                   fontWeight: active ? 500 : 400,
-                  color: active ? 'var(--gold)' : 'var(--text-2)',
+                  color: active ? 'var(--accent)' : 'var(--text-2)',
                   transition: 'all 0.15s',
                 }}
                 onMouseEnter={e => { if (!active) { e.currentTarget.style.background = 'var(--bg-3)'; e.currentTarget.style.borderColor = 'var(--border-2)' } }}
@@ -135,11 +132,11 @@ export default function ConfigPopup({ mode, config, onChange }) {
               style={{
                 padding: '5px 12px',
                 borderRadius: 8,
-                border: active ? '1px solid var(--gold)' : '1px solid var(--border)',
-                background: active ? 'var(--gold-dim)' : 'transparent',
+                border: active ? '1px solid var(--accent)' : '1px solid var(--border)',
+                background: active ? 'var(--accent-dim)' : 'transparent',
                 fontFamily: 'var(--ff-mono)',
                 fontSize: 11,
-                color: active ? 'var(--gold)' : 'var(--text-2)',
+                color: active ? 'var(--accent)' : 'var(--text-2)',
                 transition: 'all 0.15s',
               }}
               onMouseEnter={e => { if (!active) { e.currentTarget.style.background = 'var(--bg-3)'; e.currentTarget.style.borderColor = 'var(--border-2)' } }}
@@ -160,11 +157,11 @@ export default function ConfigPopup({ mode, config, onChange }) {
               style={{
                 padding: '7px 0',
                 borderRadius: 8,
-                border: active ? '1px solid var(--gold)' : '1px solid var(--border)',
-                background: active ? 'var(--gold-dim)' : 'transparent',
+                border: active ? '1px solid var(--accent)' : '1px solid var(--border)',
+                background: active ? 'var(--accent-dim)' : 'transparent',
                 fontFamily: 'var(--ff-mono)',
                 fontSize: 11,
-                color: active ? 'var(--gold)' : 'var(--text-2)',
+                color: active ? 'var(--accent)' : 'var(--text-2)',
                 textAlign: 'center',
                 transition: 'all 0.15s',
               }}

@@ -31,6 +31,11 @@ MODEL_MAP = {
     "pro":  "dreamina-seedance-2-0-260128",
 }
 
+IMAGE_MODEL_MAP = {
+    "seedream": "seedream-5-0-260128",
+    "lite":     "seedream-5-0-lite-260128",
+}
+
 
 # ── Health ─────────────────────────────────────────────────────────────
 @app.get("/api/health")
@@ -131,6 +136,7 @@ class ImageRequest(BaseModel):
     image_urls: List[str] = []
     size: str = "2K"
     aspect_ratio: str = "1:1"
+    model: str = "seedream"
 
 
 @app.post("/api/image")
@@ -146,7 +152,7 @@ async def generate_image(req: ImageRequest):
 
 async def _generate_image(req: ImageRequest):
     payload: dict = {
-        "model": "seedream-5-0-260128",
+        "model": IMAGE_MODEL_MAP.get(req.model, IMAGE_MODEL_MAP["seedream"]),
         "prompt": req.prompt,
         "size": req.size,
         "response_format": "url",

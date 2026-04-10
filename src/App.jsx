@@ -27,6 +27,7 @@ export default function App() {
       width: '100%',
       background: 'var(--bg)',
       position: 'relative',
+      zIndex: 1,  /* ensures content renders above body::before grain (z-index:0) */
     }}>
       {/* Ambient radial glow */}
       <div style={{
