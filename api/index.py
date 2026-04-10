@@ -22,7 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-ARK_API_KEY  = os.environ.get("ARK_API_KEY", "")
+ARK_API_KEY  = os.environ.get("ARK_API_KEY", "").strip()  # strip trailing \n from env var
 ARK_BASE_URL = "https://ark.ap-southeast.bytepluses.com/api/v3"
 ASSETS_URL   = "https://assets.yesy.site/api/upload"
 
