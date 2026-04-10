@@ -2,12 +2,125 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body { @apply bg-gray-50 text-gray-900; }
+:root {
+  --bg:       #09090B;
+  --bg-1:     #111114;
+  --bg-2:     #18181C;
+  --bg-3:     #222228;
+  --bg-4:     #2C2C34;
+  --border:   rgba(255,255,255,0.06);
+  --border-2: rgba(255,255,255,0.11);
+  --gold:     #C5A45E;
+  --gold-dim: rgba(197,164,94,0.14);
+  --gold-glow:rgba(197,164,94,0.30);
+  --text-1:   #EDE8DE;
+  --text-2:   #857F78;
+  --text-3:   #4A4744;
+  --radius:   14px;
+  --ff-display: 'Cormorant Garamond', Georgia, serif;
+  --ff-body:    'Sora', system-ui, sans-serif;
+  --ff-mono:    'JetBrains Mono', 'Courier New', monospace;
 }
 
-@layer utilities {
-  .scrollbar-thin::-webkit-scrollbar { width: 4px; }
-  .scrollbar-thin::-webkit-scrollbar-track { @apply bg-transparent; }
-  .scrollbar-thin::-webkit-scrollbar-thumb { @apply bg-gray-300 rounded-full; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--ff-body);
+  background: var(--bg);
+  color: var(--text-1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Grain overlay ─────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9000;
+  opacity: 0.28;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* ── Scrollbar ──────────────────────────────────── */
+::-webkit-scrollbar       { width: 2px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg-4); border-radius: 2px; }
+
+/* ── Keyframes ──────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%,100% { opacity: 0.25; transform: scale(0.75); }
+  50%     { opacity: 1;    transform: scale(1); }
+}
+
+@keyframes shimmer {
+  from { background-position: 200% center; }
+  to   { background-position: -200% center; }
+}
+
+@keyframes reveal {
+  from { opacity: 0; clip-path: inset(8px 8px 8px 8px round 16px); }
+  to   { opacity: 1; clip-path: inset(0px 0px 0px 0px round 16px); }
+}
+
+/* ── Utility classes ────────────────────────────── */
+.fade-up {
+  animation: fadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.img-reveal {
+  animation: reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.dot-pulse {
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.shimmer-text {
+  background: linear-gradient(90deg, var(--text-2) 25%, var(--gold) 50%, var(--text-2) 75%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 2.5s linear infinite;
+}
+
+/* ── Button reset ───────────────────────────────── */
+button {
+  all: unset;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+/* ── Input / textarea reset ─────────────────────── */
+input, textarea {
+  all: unset;
+  box-sizing: border-box;
+}
+
+/* ── Gold divider ───────────────────────────────── */
+.gold-line {
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: var(--gold);
+  opacity: 0.6;
 }
