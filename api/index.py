@@ -144,7 +144,7 @@ async def _generate_image(req: ImageRequest):
     if req.image_urls:
         payload["image"] = req.image_urls
 
-    async with httpx.AsyncClient(timeout=55) as client:
+    async with httpx.AsyncClient(timeout=120) as client:
         resp = await client.post(
             f"{ARK_BASE_URL}/images/generations",
             headers={"Authorization": f"Bearer {ARK_API_KEY}"},
